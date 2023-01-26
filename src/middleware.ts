@@ -6,22 +6,19 @@ import type { NextRequest } from 'next/server';
 const publicPaths = ['/', '/sign-in*', '/sign-up*'];
 
 const isPublic = (path: string) => {
-  return publicPaths.find((x) =>
-    path.match(new RegExp(`^${x}$`.replace('*$', '($|/)')))
-  );
+  return publicPaths.find(x => path.match(new RegExp(`^${x}$`.replace('*$', '($|/)'))));
 };
 
 export default withClerkMiddleware((request: NextRequest) => {
   const { userId } = getAuth(request);
-  
-  
+
   if (isPublic(request.nextUrl.pathname) && userId) {
     const dashboardUrl = new URL('/dashboard', request.url);
     return NextResponse.redirect(dashboardUrl);
   } else if (isPublic(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
-  
+
   // if the user is not signed in redirect them to the sign in page.
   if (!userId) {
     // redirect the users to /pages/sign-in/[[...index]].ts
